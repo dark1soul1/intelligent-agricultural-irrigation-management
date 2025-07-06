@@ -1920,8 +1920,6 @@ const getCategoryText = (category) => {
 
 const handleDetail = (item) => {
   // 这里可以添加查看详情页面的逻辑
-  // 暂时保留console.log用于调试
-  console.log('查看详情:', item)
 }
 
 const carouselImages = [
@@ -1943,18 +1941,11 @@ const getCarouselBackground = (index) => {
   const img = new Image()
   img.src = imageUrl
   img.onload = () => {
-    console.log('图片加载成功:', imageUrl)
+    // 图片加载成功
   }
   img.onerror = () => {
     console.error('图片加载失败:', imageUrl)
   }
-  
-  console.log('轮播图背景:', {
-    index: index,
-    imageIndex: imageIndex,
-    imageUrl: imageUrl,
-    finalStyle: `url(${imageUrl})`
-  })
   
   return `url(${imageUrl})`
 }

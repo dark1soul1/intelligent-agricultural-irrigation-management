@@ -321,15 +321,9 @@ const handleDialogClose = () => {
 
 // 组件挂载时初始化
 onMounted(() => {
-  // 添加调试信息
-  console.log('🎯 AI助手组件已挂载')
-  console.log('📸 虚拟形象图片路径:', mascotImageUrl.value)
-  console.log('📍 组件位置: 右下角固定定位')
-  
   // 确保组件可见
   const assistantElement = document.querySelector('.ai-assistant')
   if (assistantElement) {
-    console.log('✅ AI助手DOM元素已找到')
     assistantElement.style.display = 'block'
     assistantElement.style.visibility = 'visible'
   } else {

@@ -343,19 +343,11 @@ const getAllData = async () => {
 
 // 应用筛选并更新所有显示
 const applyFilterAndUpdate = () => {
-  console.log('应用筛选并更新显示...')
   // 根据时间范围筛选历史记录
   const filteredHistory = filterDataByDateRange(originalHistoryData.value, queryParams.dateRange)
   
   // 根据时间范围筛选传感器数据
   const filteredSensor = filterDataByDateRange(originalSensorData.value, queryParams.dateRange)
-  
-  console.log('筛选结果:', {
-    originalHistory: originalHistoryData.value.length,
-    filteredHistory: filteredHistory.length,
-    originalSensor: originalSensorData.value.length,
-    filteredSensor: filteredSensor.length
-  })
   
   // 更新分页数据
   const startIndex = (queryParams.pageNum - 1) * queryParams.pageSize
@@ -371,7 +363,6 @@ const applyFilterAndUpdate = () => {
   
   // 更新图表（基于筛选后的数据）
   nextTick(() => {
-    console.log('更新图表...')
     updateChartWithFilteredData(filteredHistory, filteredSensor)
   })
 }
@@ -455,13 +446,10 @@ const getFields = async () => {
 watch(
   () => queryParams.fieldId,
   (newFieldId, oldFieldId) => {
-    console.log('农田选择变化:', newFieldId, '->', oldFieldId)
     // 当农田变化时，重新获取所有数据
     if (newFieldId) {
-      console.log('开始获取数据...')
       getAllData()
     } else {
-      console.log('清空数据...')
       // 清空所有数据
       originalHistoryData.value = []
       originalSensorData.value = []
@@ -511,10 +499,8 @@ watch(
 watch(
   () => queryParams.dateRange,
   () => {
-    console.log('时间范围变化:', queryParams.dateRange)
     // 时间范围变化时，只重新应用筛选，不重新获取数据
     if (queryParams.fieldId && (originalHistoryData.value.length > 0 || originalSensorData.value.length > 0)) {
-      console.log('重新应用筛选...')
       applyFilterAndUpdate()
     }
   },
@@ -875,7 +861,6 @@ const handleResize = () => {
 }
 
 const handleChartTypeChange = () => {
-  console.log('图表类型变化:', chartType.value)
   // 当图表类型改变时，只更新图表，不重新获取数据
   if (queryParams.fieldId && (originalHistoryData.value.length > 0 || originalSensorData.value.length > 0)) {
     const filteredHistory = filterDataByDateRange(originalHistoryData.value, queryParams.dateRange)
