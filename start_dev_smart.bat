@@ -27,9 +27,9 @@ echo 检测服务状态...
 timeout /t 5 /nobreak >nul
 
 REM 检测所有服务端口
-netstat -an | findstr :3000 >nul
-set portal_ready=%errorlevel%
 netstat -an | findstr :80 >nul
+set portal_ready=%errorlevel%
+netstat -an | findstr :8081 >nul
 set admin_ready=%errorlevel%
 netstat -an | findstr :8001 >nul
 set ai_ready=%errorlevel%
@@ -54,8 +54,8 @@ echo.
 
 echo.
 echo 🌐 浏览器已自动打开！
-echo 📱 Portal前台: http://localhost:3000
-echo 🖥️  Admin后台: http://localhost:80
+echo 📱 Portal前台: http://localhost:80
+echo 🖥️  Admin后台: http://localhost:8081
 echo 🤖 AI服务: ws://localhost:8001
 echo.
 echo 按任意键关闭此窗口...
