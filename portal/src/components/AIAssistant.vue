@@ -249,7 +249,10 @@ const sendMessage = async () => {
   
   try {
     // 创建WebSocket连接
-    ws.value = new WebSocket('ws://localhost:8001')
+    const wsUrl = import.meta.env.VITE_AI_SERVER_URL || 'ws://106.14.170.191:8001'
+    console.log('🔧 WebSocket URL:', wsUrl)
+    console.log('🔧 环境变量:', import.meta.env.VITE_AI_SERVER_URL)
+    ws.value = new WebSocket(wsUrl)
     
     ws.value.onopen = () => {
       console.log('✅ WebSocket连接已建立')

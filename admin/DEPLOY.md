@@ -44,7 +44,7 @@ yarn build:prod
 ### 开发环境 (env.development)
 ```
 VITE_APP_ENV = 'development'
-VITE_APP_BASE_API = '/dev-api'
+VITE_APP_BASE_API = '/api'
 VITE_APP_TITLE = '智慧农业灌溉管理系统'
 VITE_BACKEND_URL = 'http://192.168.43.80:8080'
 VITE_PORT = 80
@@ -53,7 +53,7 @@ VITE_PORT = 80
 ### 生产环境 (env.production)
 ```
 VITE_APP_ENV = 'production'
-VITE_APP_BASE_API = '/prod-api'
+VITE_APP_BASE_API = '/api'
 VITE_APP_TITLE = '智慧农业灌溉管理系统'
 VITE_BACKEND_URL = 'http://192.168.43.80:8080'
 ```
@@ -73,7 +73,7 @@ server {
     }
 
     # API代理
-    location /prod-api/ {
+    location /api/ {
         proxy_pass http://your-backend-server:8080/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
