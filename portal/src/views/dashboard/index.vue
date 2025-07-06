@@ -276,8 +276,15 @@
                   <span class="field-value">{{ field.location }}</span>
                 </div>
               </div>
-              <div class="info-item" v-if="weatherInfo">
+              <div class="info-item" v-if="getFieldWeather(field)">
                 <span class="field-label">当前天气</span>
+                <div class="field-value-row">
+                  <el-icon><component :is="getWeatherIcon(getFieldWeather(field).weather)" /></el-icon>
+                  <span class="field-value">{{ getFieldWeather(field).weather }}{{ getFieldWeather(field).temperature !== '--' ? ' ' + getFieldWeather(field).temperature + '°C' : '' }}</span>
+                </div>
+              </div>
+              <div class="info-item" v-else-if="weatherInfo">
+                <span class="field-label">默认天气</span>
                 <div class="field-value-row">
                   <el-icon><component :is="getWeatherIcon(weatherInfo.weather)" /></el-icon>
                   <span class="field-value">{{ weatherInfo.weather }} {{ weatherInfo.temperature }}°C</span>
@@ -415,7 +422,7 @@
             <!-- 操作按钮 -->
             <div class="field-actions">
               <el-tooltip 
-                :content="weatherInfo ? `将使用当前天气：${weatherInfo.weather} ${weatherInfo.temperature}°C` : '天气信息加载中...'" 
+                :content="getFieldWeather(selectedField) ? `将使用${selectedField.fieldName}的天气：${getFieldWeather(selectedField).weather}${getFieldWeather(selectedField).temperature !== '--' ? ' ' + getFieldWeather(selectedField).temperature + '°C' : ''}` : (weatherInfo ? `将使用默认天气：${weatherInfo.weather} ${weatherInfo.temperature}°C` : '天气信息加载中...')" 
                 placement="top"
               >
                 <el-button size="small" type="success" @click="generateAutoPlan(field)">
@@ -471,14 +478,17 @@
           <el-descriptions-item label="农田位置" label-class-name="detail-label" content-class-name="detail-content">
             {{ selectedField.location }}
           </el-descriptions-item>
-          <el-descriptions-item label="当前天气" label-class-name="detail-label" content-class-name="detail-content" v-if="weatherInfo">
+          <el-descriptions-item label="当前天气" label-class-name="detail-label" content-class-name="detail-content" v-if="getFieldWeather(selectedField)">
             <div class="weather-detail-item">
-              <el-icon><component :is="getWeatherIcon(weatherInfo.weather)" /></el-icon>
-              <span>{{ weatherInfo.weather }} {{ weatherInfo.temperature }}°C 湿度{{ weatherInfo.humidity }}%</span>
+              <el-icon><component :is="getWeatherIcon(getFieldWeather(selectedField).weather)" /></el-icon>
+              <span>{{ getFieldWeather(selectedField).weather }}{{ getFieldWeather(selectedField).temperature !== '--' ? ' ' + getFieldWeather(selectedField).temperature + '°C' : '' }}{{ getFieldWeather(selectedField).humidity !== '--' ? ' 湿度' + getFieldWeather(selectedField).humidity + '%' : '' }}</span>
             </div>
           </el-descriptions-item>
-          <el-descriptions-item label="天气更新时间" label-class-name="detail-label" content-class-name="detail-content" v-if="weatherInfo">
-            {{ weatherInfo.reporttime || '未知' }}
+          <el-descriptions-item label="天气更新时间" label-class-name="detail-label" content-class-name="detail-content" v-if="getFieldWeather(selectedField)">
+            {{ getFieldWeather(selectedField).reporttime !== '--' ? getFieldWeather(selectedField).reporttime : '未知' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="天气位置" label-class-name="detail-label" content-class-name="detail-content" v-if="getFieldWeather(selectedField)">
+            {{ selectedField.location }}
           </el-descriptions-item>
         </el-descriptions>
         
@@ -579,7 +589,7 @@ import { listSensordata } from '@/api/irrigation/sensordata'
 import { listDevices } from '@/api/irrigation/devices'
 import { listHistory } from '@/api/irrigation/history'
 import { listKnowledge } from '@/api/irrigation/knowledge'
-import { getDefaultWeather } from '@/api/irrigation/weather'
+import { getDefaultWeather, getWeatherForFields } from '@/api/irrigation/weather'
 import * as echarts from 'echarts'
 import defaultAvatar from '@/assets/images/profile.png'
 import { Location, MapLocation, DataAnalysis, Monitor, TrendCharts, Picture, Clock, Timer, InfoFilled, Sunny, Cloudy, Umbrella, Search, Refresh, Document, Calendar, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
@@ -595,6 +605,8 @@ const fieldDetailVisible = ref(false)
 const selectedField = ref(null)
 const moistureCharts = reactive({})
 const weatherInfo = ref(null)
+// 农田天气信息缓存
+const fieldWeatherCache = ref({})
 
 // 计划内联编辑相关
 const editingPlan = ref(null)
@@ -816,7 +828,7 @@ function showFieldDetail(field) {
   fieldDetailVisible.value = true
 }
 
-// 获取天气信息
+// 获取天气信息（默认地区）
 const fetchWeatherInfo = async () => {
   try {
     const response = await getDefaultWeather()
@@ -828,6 +840,50 @@ const fetchWeatherInfo = async () => {
   }
 }
 
+// 获取所有农田的天气信息
+const fetchAllFieldsWeather = async () => {
+  if (!fields.value || fields.value.length === 0) {
+    return
+  }
+  
+  try {
+    // 过滤掉位置为'中国台湾'的农田，不查询天气
+    const fieldsToQuery = fields.value.filter(field => field.location !== '中国台湾')
+    
+    if (fieldsToQuery.length > 0) {
+      const weatherResults = await getWeatherForFields(fieldsToQuery)
+      weatherResults.forEach(result => {
+        if (result.weather) {
+          fieldWeatherCache.value[result.fieldId] = result.weather
+        }
+      })
+    }
+  } catch (error) {
+    console.error('批量获取农田天气失败:', error)
+  }
+}
+
+// 获取农田对应的天气信息
+const getFieldWeather = (field) => {
+  if (!field || !field.fieldId) {
+    return null
+  }
+  
+  // 如果位置是'中国台湾'，返回特殊天气信息
+  if (field.location === '中国台湾') {
+    return {
+      weather: '钟山风雨',
+      temperature: '49.7',
+      humidity: '--',
+      winddirection: '--',
+      windpower: '--',
+      reporttime: '--'
+    }
+  }
+  
+  return fieldWeatherCache.value[field.fieldId] || null
+}
+
 // 获取天气图标
 const getWeatherIcon = (weather) => {
   if (!weather) return Sunny
@@ -835,7 +891,7 @@ const getWeatherIcon = (weather) => {
   const weatherText = weather.toLowerCase()
   if (weatherText.includes('晴')) return Sunny
   if (weatherText.includes('云') || weatherText.includes('阴')) return Cloudy
-  if (weatherText.includes('雨') || weatherText.includes('雪')) return Umbrella
+  if (weatherText.includes('雨') || weatherText.includes('雪') || weatherText.includes('风雨')) return Umbrella
   return Sunny
 }
 
@@ -917,6 +973,7 @@ async function fetchAllData() {
     
     // 5. 获取天气信息
     await fetchWeatherInfo()
+    await fetchAllFieldsWeather() // 获取所有农田的天气信息
   } catch (error) {
     console.error('获取首页数据失败:', error)
   }
@@ -1361,7 +1418,7 @@ const convertWeatherType = (weatherText) => {
   const weather = weatherText.toLowerCase()
   if (weather.includes('晴')) return 'sunny'
   if (weather.includes('云') || weatherText.includes('阴')) return 'cloudy'
-  if (weather.includes('雨') || weatherText.includes('雪')) return 'rainy'
+  if (weather.includes('雨') || weatherText.includes('雪') || weatherText.includes('风雨')) return 'rainy'
   return 'cloudy'
 }
 
@@ -1375,8 +1432,10 @@ const generateAutoPlan = async (field) => {
     const soilMoisture = sensorData?.soilMoisture || sensorData?.soil_moisture || sensorData?.moisture || sensorData?.humidity || 65
     const soilTemperature = sensorData?.soilTemperature || sensorData?.soil_temperature || sensorData?.temperature || sensorData?.temp || 25
     
-    // 获取天气信息
-    const weatherType = weatherInfo.value ? convertWeatherType(weatherInfo.value.weather) : 'sunny'
+    // 获取农田对应的天气信息
+    const fieldWeather = getFieldWeather(field)
+    const weatherType = fieldWeather ? convertWeatherType(fieldWeather.weather) : 
+                       (weatherInfo.value ? convertWeatherType(weatherInfo.value.weather) : 'sunny')
     
     // 构建请求数据
     const requestData = {

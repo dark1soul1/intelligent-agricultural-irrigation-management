@@ -627,7 +627,7 @@ import { listPlans, addPlans, updatePlans, delPlans, executePlan, cancelPlan, ge
 import { listFields } from '@/api/irrigation/fields.js'
 import { generatePlanAPI, adjustPlanAPI, startIrrigationAPI, endIrrigationAPI } from '@/api/irrigation/irrigation.js'
 import { listSensordata } from '@/api/irrigation/sensordata.js'
-import { getDefaultWeather } from '@/api/irrigation/weather'
+import { getDefaultWeather, getWeatherByFieldLocation, getWeatherForFields } from '@/api/irrigation/weather'
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -657,6 +657,8 @@ const selectedField = ref(null)
 
 // 天气信息
 const weatherInfo = ref(null)
+// 农田天气信息缓存
+const fieldWeatherCache = ref({})
 
 // 传感器数据缓存
 const sensorDataCache = ref({})
