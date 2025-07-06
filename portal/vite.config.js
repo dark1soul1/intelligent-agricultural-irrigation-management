@@ -39,6 +39,12 @@ export default defineConfig({
                                               //http://106.14.170.191:8080;http://192.168.43.80:8080
         changeOrigin: true,                   //172.20.10.3
         rewrite: (path) => path.replace(/^\/api/, '')
+      },
+      // 如果需要使用Mock服务，可以添加以下配置
+      '/api/email': {
+        target: 'http://127.0.0.1:4523',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/email/, '/m1/6686103-6395409-default/email/1')
       }
     }
   },

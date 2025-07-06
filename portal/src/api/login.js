@@ -71,7 +71,8 @@ export function getEmailCode(email) {
     headers: {
       isToken: false
     },
-    method: 'get'
+    method: 'get',
+    timeout: 60000
   })
 }
 

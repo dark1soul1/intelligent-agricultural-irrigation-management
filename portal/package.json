@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "vite --mode development",
     "build": "vite build --mode production",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "mock": "node mock-server.js"
   },
   "dependencies": {
     "@element-plus/icons-vue": "2.3.1",
@@ -30,5 +31,9 @@
     "vite": "6.3.5",
     "vite-plugin-compression": "0.5.1",
     "vite-plugin-svg-icons": "2.0.1"
+  },
+  "mockDependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
   }
 }

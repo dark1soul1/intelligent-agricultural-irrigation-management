@@ -557,9 +557,7 @@ const emailRules = {
 
 // 显示绑定邮箱对话框
 const showBindEmail = () => {
-  emailDialogVisible.value = true
-  emailForm.email = userInfo.value.email || ''
-  emailForm.code = ''
+  ElMessage.info('邮箱绑定功能开发中...')
 }
 
 // 发送验证码
