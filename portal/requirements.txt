@@ -1,0 +1,18 @@
+# AI助手服务器依赖包
+# 版本要求：Python 3.7+
+
+# 异步HTTP客户端
+httpx>=0.24.0
+
+# WebSocket服务器
+websockets>=11.0.0
+
+# 异步编程支持（Python 3.7+内置）
+# asyncio
+
+# 日志和系统支持（Python内置）
+# json
+# logging
+# sys
+# os
+# threading 

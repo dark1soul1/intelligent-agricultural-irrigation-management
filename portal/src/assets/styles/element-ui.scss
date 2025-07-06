@@ -1,0 +1,98 @@
+// element-ui 样式覆盖
+.el-breadcrumb__inner,
+.el-breadcrumb__inner a {
+  font-weight: 400 !important;
+}
+
+.el-upload {
+  input[type="file"] {
+    display: none !important;
+  }
+}
+
+.el-upload__input {
+  display: none;
+}
+
+.cell {
+  .el-tag {
+    margin-right: 0px;
+  }
+}
+
+.small-padding {
+  .cell {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+
+.fixed-width {
+  .el-button--mini {
+    padding: 7px 10px;
+    min-width: 60px;
+  }
+}
+
+.status-col {
+  .cell {
+    padding: 0 10px;
+    text-align: center;
+  }
+}
+
+// 暂时性解决dialog问题 https://github.com/ElemeFE/element/issues/2461
+.el-dialog {
+  transform: none;
+  left: 0;
+  position: relative;
+  margin: 0 auto;
+}
+
+// 修复element-ui 的text 文本框js 数字不生效
+.el-input-number {
+  .el-input__inner {
+    text-align: left;
+  }
+}
+
+// 修复 el-popover 的样式
+.el-popover {
+  max-width: 400px;
+}
+
+// 修复 el-table 的样式
+.el-table {
+  .el-table__header-wrapper {
+    .el-table__header {
+      th {
+        background-color: #f5f7fa;
+        color: #606266;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// 修复 el-form 的样式
+.el-form {
+  .el-form-item {
+    .el-form-item__label {
+      font-weight: 500;
+    }
+  }
+}
+
+// 修复 el-button 的样式
+.el-button {
+  &--primary {
+    background-color: #409eff;
+    border-color: #409eff;
+    
+    &:hover,
+    &:focus {
+      background-color: #66b1ff;
+      border-color: #66b1ff;
+    }
+  }
+} 
